@@ -31,16 +31,10 @@ If you don't want to install it globally, you can execute the module on the fly 
 npx cpsync <device_path> <sync_path>
 ```
 
-I like to execute the module from the terminal prompt in Visual Studio Code, but keep the terminal available to execute other commands, so I start the module using the following:
+I run Windows and I like to execute the module from the terminal prompt in Visual Studio Code, but keep the terminal available to execute other commands, so I start the module using the following:
 
 ``` shell
 start cpsync <device_path> <sync_path>
-```
-
-On macOS and, I think, Linux, use the following:
-
-``` shell
-open cpsync <device_path> <sync_path>
 ```
 
 This starts the module in a separate terminal window, leaving the Visual Studio terminal available to me to execute additional commands.  For example, if I execute the following command:
