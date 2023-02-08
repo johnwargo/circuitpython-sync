@@ -1,0 +1,7 @@
+# Folders
+src/
+
+# Files
+tsconfig.json
+test.sh
+test.cmd

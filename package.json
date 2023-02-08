@@ -1,0 +1,28 @@
+{
+  "name": "cpsync",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "bin": {
+    "cpsync": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc && cpsync fakesrc fakedest -d",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/figlet": "^1.5.5",
+    "chalk": "^4.1.2",
+    "chokidar": "^3.5.3",
+    "cli-logger": "^0.5.40",
+    "commander": "^10.0.0",
+    "figlet": "^1.5.2"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.18"
+  }
+}
