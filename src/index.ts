@@ -54,6 +54,19 @@ function ignoreFile(filePath: string): boolean {
   return result;
 }
 
+function ignoreFolder(folderPath: string): boolean {
+  var result = false;
+  if (options.ignore) {
+    ignoreFolders.forEach((ignoreFolder) => {
+      if (path.basename(folderPath) == ignoreFolder) {
+        result = true;
+        return;
+      }
+    });
+  }
+  return result;
+}
+
 function directoryExists(filePath: string): boolean {
   log.debug(`Validating ${filePath}`);
   if (fs.existsSync(filePath)) {
@@ -170,16 +183,28 @@ async function watchFolder(devicePath: string, syncPath: string) {
       }
     })
     .on('unlink', (path: string) => {
-      log.info(`File ${path} has been removed`);
-      deleteFile(path, devicePath, syncPath);
+      if (!ignoreFile(path)) {
+        log.info(`File ${path} has been removed`);
+        deleteFile(path, devicePath, syncPath);
+      } else {
+        log.info(warning(`Ignoring ${path} deletion`));
+      }
     })
     .on('addDir', (path: string) => {
-      log.info(`Directory ${path} has been added`);
-      makeDirectory(path, devicePath, syncPath);
+      if (!ignoreFolder(path)){
+        log.info(`Folder ${path} has been added`);
+        makeDirectory(path, devicePath, syncPath);
+      } else {
+        log.info(warning(`Ignoring ${path} directory`));
+      }      
     })
     .on('unlinkDir', (path: string) => {
-      log.info(`Directory ${path} has been removed`);
-      deleteDirectory(path, devicePath, syncPath);
+      if (!ignoreFolder(path)) {
+        log.info(`Folder ${path} has been removed`);
+        deleteDirectory(path, devicePath, syncPath);
+      } else {
+        log.info(warning(`Ignoring ${path} deletion`));
+      }      
     })
     .on('error', (errStr: string) => log.error(error(`Watcher error: ${errStr}`)))
     .on('ready', () => log.info(warning('Watching folder for changes')));

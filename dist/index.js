@@ -47,19 +47,36 @@ const ignoreFiles = [
     'test_results.txt',
     '.Trashes'
 ];
+const ignoreFolders = [
+    '.fseventsd',
+    'System Volume Information',
+    '.Trashes'
+];
 var log = logger();
 var options;
 function initOptions() {
     if (options.ignore)
         log.info('Ignore files mode enabled');
     log.level(options.debug ? log.DEBUG : log.INFO);
-    log.debug('Debug mode is enabled');
+    log.info('Debug mode is enabled');
 }
 function ignoreFile(filePath) {
     var result = false;
     if (options.ignore) {
         ignoreFiles.forEach((ignoreFile) => {
             if (path.basename(filePath) == ignoreFile) {
+                result = true;
+                return;
+            }
+        });
+    }
+    return result;
+}
+function ignoreFolder(folderPath) {
+    var result = false;
+    if (options.ignore) {
+        ignoreFolders.forEach((ignoreFolder) => {
+            if (path.basename(folderPath) == ignoreFolder) {
                 result = true;
                 return;
             }
@@ -167,16 +184,31 @@ async function watchFolder(devicePath, syncPath) {
         }
     })
         .on('unlink', (path) => {
-        log.info(`File ${path} has been removed`);
-        deleteFile(path, devicePath, syncPath);
+        if (!ignoreFile(path)) {
+            log.info(`File ${path} has been removed`);
+            deleteFile(path, devicePath, syncPath);
+        }
+        else {
+            log.info(warning(`Ignoring ${path} deletion`));
+        }
     })
         .on('addDir', (path) => {
-        log.info(`Directory ${path} has been added`);
-        makeDirectory(path, devicePath, syncPath);
+        if (!ignoreFolder(path)) {
+            log.info(`Folder ${path} has been added`);
+            makeDirectory(path, devicePath, syncPath);
+        }
+        else {
+            log.info(warning(`Ignoring ${path} directory`));
+        }
     })
         .on('unlinkDir', (path) => {
-        log.info(`Directory ${path} has been removed`);
-        deleteDirectory(path, devicePath, syncPath);
+        if (!ignoreFolder(path)) {
+            log.info(`Folder ${path} has been removed`);
+            deleteDirectory(path, devicePath, syncPath);
+        }
+        else {
+            log.info(warning(`Ignoring ${path} deletion`));
+        }
     })
         .on('error', (errStr) => log.error(error(`Watcher error: ${errStr}`)))
         .on('ready', () => log.info(warning('Watching folder for changes')));
