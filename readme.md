@@ -18,15 +18,14 @@ Here's how it works:
 5. Open any editor you want and edit the Python source code files (and any other file) on the connected device. 
 6. When you save any modified files on the connected CircuitPython device, the module automatically copies the modified file(s) to the project folder.
 
-[See the module in action](https://www.youtube.com/watch?v=QkF4pEy4YIY)
-
+[See the module in action on YouTube](https://www.youtube.com/watch?v=QkF4pEy4YIY)
 
 ## Installation
 
 To install globally, open a command prompt or terminal window and execute the following command:
 
 ``` shell
-npm install -g circuitpython-sync
+npm install -g cpsync
 ```
 
 You'll want to install globally since CircuitPython projects don't generally use Node modules (like this one) so a `package.json` file and `node_modules` folder will look weird in your project folder.
@@ -49,7 +48,7 @@ Both parameters are required. If you launch the module from your project folder,
 If you don't want to install the module globally, you can execute the module on the fly instead using:
 
 ``` shell
-npx circuitpython-sync <device_path> <sync_path>
+npx cpsync <device_path> <sync_path>
 ```
 
 I run Windows and I like to execute the module from the terminal prompt in Visual Studio Code, but keep the terminal available to execute other commands, so I start the module using the following:

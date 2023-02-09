@@ -1,6 +1,6 @@
 {
   "name": "cpsync",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "",
   "main": "dist/index.js",
   "bin": {
@@ -8,12 +8,11 @@
   },
   "scripts": {
     "build": "tsc",
-    "dev": "tsc && cpsync fakesrc fakedest -d",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "John M. Wargo",
+  "license": "MIT",
   "dependencies": {
     "@types/figlet": "^1.5.5",
     "chalk": "^4.1.2",
