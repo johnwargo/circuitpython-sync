@@ -26,13 +26,19 @@ const ignoreFiles = [
   '.Trashes'
 ] as const;
 
+const ignoreFolders = [
+  '.fseventsd',
+  'System Volume Information',
+  '.Trashes'
+] as const;
+
 var log = logger();
 var options: any;
 
 function initOptions() {
   if (options.ignore) log.info('Ignore files mode enabled');
   log.level(options.debug ? log.DEBUG : log.INFO);
-  log.debug('Debug mode is enabled');
+  log.info('Debug mode is enabled');
 }
 
 function ignoreFile(filePath: string): boolean {
