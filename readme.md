@@ -2,6 +2,23 @@
 
 Node module that synchronizes the files on a connected CircuitPython device to a local project folder.
 
+When you work with a CircuitPython device, you generally read and write executable Python files directly from/to the device; there's even a Python editor called [Mu](https://codewith.mu/) built just for this use case. 
+
+Many more experienced developers work with a local project folder then transfer the source code to a connected device, as you do when working with Arduino and other platforms. This module allows you to do both:
+
+1. Read/write source code from/to a connected Circuit Python device using Mu or other editors (even Visual Studio Code plugins). 
+2. Automatically copy source files from the device to a local project folder whenever the change on the device. 
+
+Here's how it works:
+
+1. Create a local Python project with all the other files you need (like a `readme.md` file, or a `.gitignore`).
+2. Connect a CircuitPython device to your computer.
+3. Open a terminal window or command prompt and execute the module specifying the CircuitPython drive path and local project path as command line arguments.
+4. The module copies all of the files from the connected CircuitPython device to the specified project folder.
+5. Open any editor you want and edit the Python source code files (and any other file) on the connected device. 
+6. When you save any modified files on the connected CircuitPython device, the module automatically copies the modified file(s) to the project folder.
+
+[See the module in action](https://www.youtube.com/watch?v=QkF4pEy4YIY)
 
 
 ## Usage
