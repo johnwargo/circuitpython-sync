@@ -4,12 +4,10 @@ import chalk from 'chalk';
 import { Command } from 'commander';
 import figlet from "figlet";
 import * as fs from "fs";
-// import * as path from "path";
 
 const chokidar = require('chokidar');
 const program = new Command();
 const logger = require('cli-logger');
-var log = logger();
 
 // Load the package.json file as an object we can pull properties from 
 const packageDotJSON = require('../package.json');
@@ -17,6 +15,17 @@ const packageDotJSON = require('../package.json');
 const error = chalk.bold.red;
 const highlight = chalk.green;
 const warning = chalk.hex('#FFA500');
+
+const ignoreFiles = [  
+  'boot_out.txt',
+  'BOOTEX.LOG',
+  '.metadata_never_index',
+  'System Volume Information',
+  'test_results.txt',
+  '.Trashes'
+] as const;
+
+var log = logger();
 
 function setupLogger() {
   const options = program.opts();
