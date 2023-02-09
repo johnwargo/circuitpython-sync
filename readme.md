@@ -67,7 +67,7 @@ start cpsync h: .
 
 A new window opens as shown in the following figure
 
-![Windows Terminal Example](images/figure-01.png)
+![Windows Terminal Example](https://github.com/johnwargo/circuitpython-sync/blob/main/images/figure-01.png)
 
 The CircuitPython device shows up as drive `H:` and the `.` tells the module to copy the files to the current folder.
 
