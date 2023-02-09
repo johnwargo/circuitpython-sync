@@ -4,6 +4,7 @@ import chalk from 'chalk';
 import { Command } from 'commander';
 import figlet from "figlet";
 import * as fs from "fs";
+import * as path from "path";
 
 const chokidar = require('chokidar');
 const program = new Command();
@@ -16,7 +17,7 @@ const error = chalk.bold.red;
 const highlight = chalk.green;
 const warning = chalk.hex('#FFA500');
 
-const ignoreFiles = [  
+const ignoreFiles = [
   'boot_out.txt',
   'BOOTEX.LOG',
   '.metadata_never_index',
@@ -26,12 +27,25 @@ const ignoreFiles = [
 ] as const;
 
 var log = logger();
+var options: any;
 
-function setupLogger() {
-  const options = program.opts();
+function initOptions() {
+  if (options.ignore) log.info('Ignore files mode enabled');
   log.level(options.debug ? log.DEBUG : log.INFO);
-  log.debug('\nDebug mode is enabled');
-  log.debug(`cwd: ${process.cwd()}`);
+  log.debug('Debug mode is enabled');
+}
+
+function ignoreFile(filePath: string): boolean {
+  var result = false;
+  if (options.ignore) {
+    ignoreFiles.forEach((ignoreFile) => {
+      if (path.basename(filePath) == ignoreFile) {
+        result = true;
+        return;
+      }
+    });
+  }
+  return result;
 }
 
 function directoryExists(filePath: string): boolean {
@@ -129,18 +143,25 @@ function validateArguments(devicePath: string, syncPath: string): boolean {
   return validationStatus;
 }
 
-
 // async function watchFolder(devicePath: string, syncPath: string, delayVal: number) {
 async function watchFolder(devicePath: string, syncPath: string) {
   const watcher = chokidar.watch(devicePath, { persistent: true });
   watcher
     .on('add', (path: string) => {
-      log.info(`File ${path} has been added`);
-      copyFile(path, devicePath, syncPath);
+      if (!ignoreFile(path)) {
+        log.info(`Adding ${path}`);
+        copyFile(path, devicePath, syncPath);
+      } else {
+        log.info(warning(`Ignoring ${path}`));
+      }
     })
     .on('change', (path: string) => {
-      log.info(`File ${path} has been updated`);
-      copyFile(path, devicePath, syncPath);
+      if (!ignoreFile(path)) {
+        log.info(`File ${path} updated`);
+        copyFile(path, devicePath, syncPath);
+      } else {
+        log.info(warning(`Ignoring change to ${path}`));
+      }
     })
     .on('unlink', (path: string) => {
       log.info(`File ${path} has been removed`);
@@ -166,12 +187,14 @@ program
   .version(packageDotJSON.version)
   .description("Synchronize files from a CircuitPython device to a local folder during development")
   .option('-d, --debug', 'Output extra information to the console', false)
+  .option('-i, --ignore', 'Ignore non-project files', false)
   .argument('<devicePath>', 'File path to the Circuit Python device')
   .argument('<destFolder>', 'Destination (local) folder')
   // .argument('[delayVal]', 'Number of seconds after a file change to wait before syncing')
   // .action((devicePath: string, syncPath: string, delayVal: string = '0') => {
-  .action((devicePath: string, destFolder: string, delayVal: string = '0') => {
-    setupLogger();
+  .action((devicePath: string, destFolder: string) => {
+    options = program.opts();
+    initOptions();
     // log.info(`\nExecuting cpsync ${devicePath} ${syncPath} ${delayVal}`);
     log.info(`Executing cpsync ${devicePath} ${destFolder}`);
     // if (validateArguments(devicePath, syncPath, delayVal)) {

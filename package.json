@@ -10,7 +10,7 @@
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [CircuitPython],
+  "keywords": ["CircuitPython"],
   "author": "John M. Wargo",
   "license": "MIT",
   "dependencies": {
