@@ -43,7 +43,7 @@ where:
 * `<device_path>` is the drive path for a connected CircuitPython device
 * `<sync_path>` is the local project folder where you want the module to copy the files from the connected CircuitPython device
 
-Both parameters are required. If you launch the module from your project folder, you can simply use a `.` for the current folder as shown in the following examples.
+Both parameters are required.
 
 If you don't want to install the module globally, you can execute the module on the fly instead using:
 
@@ -51,13 +51,31 @@ If you don't want to install the module globally, you can execute the module on 
 npx cpsync <device_path> <sync_path>
 ```
 
-I run Windows and I like to execute the module from the terminal prompt in Visual Studio Code, but keep the terminal available to execute other commands, so I start the module using the following:
+On Windows, the device will appear as a drive with a drive letter assignment. So, assuming it's drive H (your experience may vary but that's how it shows up on my Windows system) you would start the process using the following command:
+
+``` shell
+cpsync h: c:\dev\mycoolproject
+```
+
+Assuming you'll launch the module from your project folder, use a `.` for the current folder as shown in the following example:
+
+``` shell
+cpsync h: .
+```
+
+On macOS, it mounts as a drive and you can access it via `/Volumes` folder. On my system, the device mounts as `CIRCUITPY`, so you can start the sync process using: 
+
+``` shell
+cpsync /Volumes/CIRCUITPY .
+```
+
+On Windows I like to execute the module from the terminal prompt in Visual Studio Code, but keep the terminal available to execute other commands, so I start the module using the following:
 
 ``` shell
 start cpsync <device_path> <sync_path>
 ```
 
-This starts the module in a separate terminal window, leaving the Visual Studio terminal available to me to execute additional commands.  
+This starts the module in a new/separate terminal window, leaving the Visual Studio terminal available to me to execute additional commands.  
 
 For example, if I execute the following command:
 
@@ -80,6 +98,3 @@ Use [GitHub Issues](https://github.com/johnwargo/circuitpython-sync/issues) to g
 Pull Requests gladly accepted, but only with complete documentation of what the change is, why you made it, and why you think its important to have in the module.
 
 If this code helps you: <a href="https://www.buymeacoffee.com/johnwargo" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
-
-
-
