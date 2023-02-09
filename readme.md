@@ -21,7 +21,7 @@ Here's how it works:
 [See the module in action](https://www.youtube.com/watch?v=QkF4pEy4YIY)
 
 
-## Usage
+## Installation
 
 To install globally, open a command prompt or terminal window and execute the following command:
 
@@ -29,7 +29,11 @@ To install globally, open a command prompt or terminal window and execute the fo
 npm install -g circuitpython-sync
 ```
 
-Once you've installed the module, to start the sync process, in a terminal window execute the following command:
+You'll want to install globally since CircuitPython projects don't generally use Node modules (like this one) so a `package.json` file and `node_modules` folder will look weird in your project folder.
+
+## Usage
+
+To start the sync process, in a terminal window execute the following command:
 
 ``` shell
 cpsync <device_path> <sync_path>
@@ -40,12 +44,12 @@ where:
 * `<device_path>` is the drive path for a connected CircuitPython device
 * `<sync_path>` is the local project folder where you want the module to copy the files from the connected CircuitPython device
 
-Both parameters are required.
+Both parameters are required. If you launch the module from your project folder, you can simply use a `.` for the current folder as shown in the following examples.
 
-If you don't want to install it globally, you can execute the module on the fly using:
+If you don't want to install the module globally, you can execute the module on the fly instead using:
 
 ``` shell
-npx cpsync <device_path> <sync_path>
+npx circuitpython-sync <device_path> <sync_path>
 ```
 
 I run Windows and I like to execute the module from the terminal prompt in Visual Studio Code, but keep the terminal available to execute other commands, so I start the module using the following:
@@ -54,7 +58,9 @@ I run Windows and I like to execute the module from the terminal prompt in Visua
 start cpsync <device_path> <sync_path>
 ```
 
-This starts the module in a separate terminal window, leaving the Visual Studio terminal available to me to execute additional commands.  For example, if I execute the following command:
+This starts the module in a separate terminal window, leaving the Visual Studio terminal available to me to execute additional commands.  
+
+For example, if I execute the following command:
 
 ``` shell
 start cpsync h: .
@@ -64,7 +70,17 @@ A new window opens as shown in the following figure
 
 ![Windows Terminal Example](images/figure-01.png)
 
-The CircuitPython device shows up as drive H: and the . tells the module to copy the files to the current folder.
+The CircuitPython device shows up as drive `H:` and the `.` tells the module to copy the files to the current folder.
 
 Every time you change the file contents on the device, the module copies the modified files to the local project folder.
+
+### Getting Help Or Making Changes
+
+Use [GitHub Issues](https://github.com/johnwargo/circuitpython-sync/issues) to get help with this module.
+
+Pull Requests gladly accepted, but only with complete documentation of what the change is, why you made it, and why you think its important to have in the module.
+
+If this code helps you: <a href="https://www.buymeacoffee.com/johnwargo" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
+
+
 
