@@ -107,7 +107,8 @@ function directoryExists(filePath) {
     return false;
 }
 function copyFile(sourceFile, sourcePath, destPath) {
-    var targetFile = path.join(path.resolve(destPath), path.basename(sourceFile));
+    var targetFile = sourceFile.replace(sourcePath, '');
+    targetFile = path.join(destPath, targetFile);
     log.debug(`Copying ${sourceFile} to ${targetFile}`);
     try {
         fs.copyFileSync(sourceFile, targetFile);
@@ -127,7 +128,8 @@ function deleteFile(deleteFile, sourcePath, destPath) {
     }
 }
 function makeDirectory(sourceDir, sourcePath, destPath) {
-    var targetDir = sourceDir.replace(sourcePath, path.resolve(destPath));
+    var targetDir = sourceDir.replace(sourcePath, '');
+    targetDir = path.join(destPath, targetDir);
     if (directoryExists(targetDir)) {
         log.debug(`Directory ${targetDir} already exists`);
         return;
@@ -177,40 +179,42 @@ function validateArguments(devicePath, syncPath) {
 async function watchFolder(devicePath, syncPath, options) {
     const watcher = chokidar.watch(devicePath, { persistent: true });
     watcher
-        .on('add', (path) => {
-        if (!ignoreFile(path, devicePath, options)) {
-            log.info(`Adding ${path}`);
-            copyFile(path, devicePath, syncPath);
+        .on('add', (eventPath) => {
+        if (!ignoreFile(eventPath, devicePath, options)) {
+            log.info(`Adding ${eventPath}`);
+            copyFile(eventPath, devicePath, syncPath);
         }
         else {
-            log.info(warning(`Ignoring ${path}`));
+            log.info(warning(`Ignoring ${eventPath}`));
         }
     })
-        .on('change', (path) => {
-        if (!ignoreFile(path, devicePath, options)) {
-            log.info(`File ${path} updated`);
-            copyFile(path, devicePath, syncPath);
+        .on('change', (eventPath) => {
+        if (!ignoreFile(eventPath, devicePath, options)) {
+            log.info(`File ${eventPath} updated`);
+            copyFile(eventPath, devicePath, syncPath);
         }
         else {
-            log.info(warning(`Ignoring change to ${path}`));
+            log.info(warning(`Ignoring change to ${eventPath}`));
         }
     })
-        .on('unlink', (path) => {
-        if (!ignoreFile(path, devicePath, options)) {
-            log.info(`File ${path} has been removed`);
-            deleteFile(path, devicePath, syncPath);
+        .on('unlink', (eventPath) => {
+        if (!ignoreFile(eventPath, devicePath, options)) {
+            log.info(`File ${eventPath} has been removed`);
+            deleteFile(eventPath, devicePath, syncPath);
         }
         else {
-            log.info(warning(`Ignoring ${path} deletion`));
+            log.info(warning(`Ignoring ${eventPath} deletion`));
         }
     })
-        .on('addDir', (path) => {
-        if (!ignoreFolder(path, devicePath, options)) {
-            log.info(`Folder ${path} has been added`);
-            makeDirectory(path, devicePath, syncPath);
+        .on('addDir', (eventPath) => {
+        if (path.basename(eventPath) == '.')
+            return;
+        if (!ignoreFolder(eventPath, devicePath, options)) {
+            log.info(`Folder ${eventPath} has been added`);
+            makeDirectory(eventPath, devicePath, syncPath);
         }
         else {
-            log.info(warning(`Ignoring ${path} directory`));
+            log.info(warning(`Ignoring ${eventPath} directory`));
         }
     })
         .on('unlinkDir', (path) => {
@@ -237,8 +241,9 @@ program
     .argument('<destFolder>', 'Destination (local) folder')
     .action((devicePath, destFolder) => {
     const options = program.opts();
+    if (destFolder === '.')
+        destFolder = process.cwd();
     initOptions(options);
-    log.info(`Executing cpsync ${devicePath} ${destFolder}`);
     if (validateArguments(devicePath, destFolder)) {
         log.debug("Configuration is valid");
         displayConfig(devicePath, destFolder, options);

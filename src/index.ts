@@ -97,10 +97,9 @@ function directoryExists(filePath: string): boolean {
 }
 
 function copyFile(sourceFile: string, sourcePath: string, destPath: string) {
-  // var targetFile = sourceFile.replace(sourcePath, path.resolve(destPath));
-
-  // TODO: This doesn't fix this right, doesn't work with subdirectories
-  var targetFile = path.join(path.resolve(destPath), path.basename(sourceFile));
+  // strip the device path from the file path
+  var targetFile = sourceFile.replace(sourcePath, '');
+  targetFile = path.join(destPath, targetFile);
 
   log.debug(`Copying ${sourceFile} to ${targetFile}`);
   try {
@@ -121,7 +120,12 @@ function deleteFile(deleteFile: string, sourcePath: string, destPath: string) {
 }
 
 function makeDirectory(sourceDir: string, sourcePath: string, destPath: string) {
-  var targetDir = sourceDir.replace(sourcePath, path.resolve(destPath));
+  // var targetDir = sourceDir.replace(sourcePath, path.resolve(destPath));
+
+  // strip the device path from the file path
+  var targetDir = sourceDir.replace(sourcePath, '');
+  targetDir = path.join(destPath, targetDir);
+
   if (directoryExists(targetDir)) {
     log.debug(`Directory ${targetDir} already exists`);
     return;
@@ -187,36 +191,39 @@ function validateArguments(devicePath: string, syncPath: string): boolean {
 async function watchFolder(devicePath: string, syncPath: string, options: any) {
   const watcher = chokidar.watch(devicePath, { persistent: true });
   watcher
-    .on('add', (path: string) => {
-      if (!ignoreFile(path, devicePath, options)) {
-        log.info(`Adding ${path}`);
-        copyFile(path, devicePath, syncPath);
+    .on('add', (eventPath: string) => {
+      if (!ignoreFile(eventPath, devicePath, options)) {
+        log.info(`Adding ${eventPath}`);
+        copyFile(eventPath, devicePath, syncPath);
       } else {
-        log.info(warning(`Ignoring ${path}`));
+        log.info(warning(`Ignoring ${eventPath}`));
       }
     })
-    .on('change', (path: string) => {
-      if (!ignoreFile(path, devicePath, options)) {
-        log.info(`File ${path} updated`);
-        copyFile(path, devicePath, syncPath);
+    .on('change', (eventPath: string) => {
+      if (!ignoreFile(eventPath, devicePath, options)) {
+        log.info(`File ${eventPath} updated`);
+        copyFile(eventPath, devicePath, syncPath);
       } else {
-        log.info(warning(`Ignoring change to ${path}`));
+        log.info(warning(`Ignoring change to ${eventPath}`));
       }
     })
-    .on('unlink', (path: string) => {
-      if (!ignoreFile(path, devicePath, options)) {
-        log.info(`File ${path} has been removed`);
-        deleteFile(path, devicePath, syncPath);
+    .on('unlink', (eventPath: string) => {
+      if (!ignoreFile(eventPath, devicePath, options)) {
+        log.info(`File ${eventPath} has been removed`);
+        deleteFile(eventPath, devicePath, syncPath);
       } else {
-        log.info(warning(`Ignoring ${path} deletion`));
+        log.info(warning(`Ignoring ${eventPath} deletion`));
       }
     })
-    .on('addDir', (path: string) => {
-      if (!ignoreFolder(path, devicePath, options)) {
-        log.info(`Folder ${path} has been added`);
-        makeDirectory(path, devicePath, syncPath);
+    .on('addDir', (eventPath: string) => {
+      // if it's `.` ignore it
+      if (path.basename(eventPath) == '.') return;
+
+      if (!ignoreFolder(eventPath, devicePath, options)) {
+        log.info(`Folder ${eventPath} has been added`);
+        makeDirectory(eventPath, devicePath, syncPath);
       } else {
-        log.info(warning(`Ignoring ${path} directory`));
+        log.info(warning(`Ignoring ${eventPath} directory`));
       }
     })
     .on('unlinkDir', (path: string) => {
@@ -246,9 +253,10 @@ program
   // .action((devicePath: string, syncPath: string, delayVal: string = '0') => {
   .action((devicePath: string, destFolder: string) => {
     const options = program.opts();
+    // Fix our dest folder if it's the current directory
+    if (destFolder === '.') destFolder = process.cwd();
+    // Initialize 'stuff'
     initOptions(options);
-    // log.info(`\nExecuting cpsync ${devicePath} ${syncPath} ${delayVal}`);
-    log.info(`Executing cpsync ${devicePath} ${destFolder}`);
     // if (validateArguments(devicePath, syncPath, delayVal)) {
     if (validateArguments(devicePath, destFolder)) {
       log.debug("Configuration is valid");
