@@ -72,11 +72,12 @@ function ignoreFile(filePath) {
     }
     return result;
 }
-function ignoreFolder(folderPath) {
+function ignoreFolder(folderPath, sourcePath) {
     var result = false;
     if (options.ignore) {
+        var comparePath = folderPath.replace(sourcePath, '');
         ignoreFolders.forEach((ignoreFolder) => {
-            if (path.basename(folderPath) == ignoreFolder) {
+            if (comparePath.startsWith(ignoreFolder)) {
                 result = true;
                 return;
             }
@@ -193,7 +194,7 @@ async function watchFolder(devicePath, syncPath) {
         }
     })
         .on('addDir', (path) => {
-        if (!ignoreFolder(path)) {
+        if (!ignoreFolder(path, devicePath)) {
             log.info(`Folder ${path} has been added`);
             makeDirectory(path, devicePath, syncPath);
         }
@@ -202,7 +203,7 @@ async function watchFolder(devicePath, syncPath) {
         }
     })
         .on('unlinkDir', (path) => {
-        if (!ignoreFolder(path)) {
+        if (!ignoreFolder(path, devicePath)) {
             log.info(`Folder ${path} has been removed`);
             deleteDirectory(path, devicePath, syncPath);
         }

@@ -54,11 +54,12 @@ function ignoreFile(filePath: string): boolean {
   return result;
 }
 
-function ignoreFolder(folderPath: string): boolean {
+function ignoreFolder(folderPath: string, sourcePath: string): boolean {
   var result = false;
   if (options.ignore) {
+    var comparePath = folderPath.replace(sourcePath, '');
     ignoreFolders.forEach((ignoreFolder) => {
-      if (path.basename(folderPath) == ignoreFolder) {
+      if (comparePath.startsWith(ignoreFolder)) {
         result = true;
         return;
       }
@@ -191,20 +192,20 @@ async function watchFolder(devicePath: string, syncPath: string) {
       }
     })
     .on('addDir', (path: string) => {
-      if (!ignoreFolder(path)){
+      if (!ignoreFolder(path, devicePath)) {
         log.info(`Folder ${path} has been added`);
         makeDirectory(path, devicePath, syncPath);
       } else {
         log.info(warning(`Ignoring ${path} directory`));
-      }      
+      }
     })
     .on('unlinkDir', (path: string) => {
-      if (!ignoreFolder(path)) {
+      if (!ignoreFolder(path, devicePath)) {
         log.info(`Folder ${path} has been removed`);
         deleteDirectory(path, devicePath, syncPath);
       } else {
         log.info(warning(`Ignoring ${path} deletion`));
-      }      
+      }
     })
     .on('error', (errStr: string) => log.error(error(`Watcher error: ${errStr}`)))
     .on('ready', () => log.info(warning('Watching folder for changes')));
