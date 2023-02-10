@@ -44,16 +44,15 @@ function ignoreFile(filePath: string, sourcePath: string, options: any): boolean
   var result = false;
   if (options.ignore) {
 
-    // // strip the device path from the file path
-    // var comparePath = filePath.replace(sourcePath, '');
-    // // do we have a delimiter?
-    // if (comparePath.indexOf(path.sep) > -1) {
-    //   // then we have a directory in the path, check it out
-    //   var compareFolder = sourcePath + comparePath.split(path.sep)[0];
-    //   log.info(`Folder: ${compareFolder}`)
-    //   if (ignoreFolder(compareFolder, sourcePath, options)) return true;
-    // }
-
+    // strip the device path from the file path
+    var comparePath = filePath.replace(sourcePath, '');
+    // do we have a delimiter?
+    if (comparePath.indexOf(path.sep) > -1) {
+      // then we have a directory in the path, check it out
+      var compareFolder = sourcePath + comparePath.split(path.sep)[0];
+      log.info(`Folder: ${compareFolder}`)
+      if (ignoreFolder(compareFolder, sourcePath, options)) return true;
+    }
 
     ignoreFiles.forEach((ignoreFile) => {
       // https://masteringjs.io/tutorials/fundamentals/foreach-break
@@ -106,7 +105,7 @@ function ignoreFolder(folderPath: string, sourcePath: string, options: any): boo
         return;
       }
       if (comparePath.startsWith(ignoreFolder)) {
-        result = true;        
+        result = true;
       }
     });
   }

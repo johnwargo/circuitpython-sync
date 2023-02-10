@@ -62,6 +62,13 @@ function initOptions(options) {
 function ignoreFile(filePath, sourcePath, options) {
     var result = false;
     if (options.ignore) {
+        var comparePath = filePath.replace(sourcePath, '');
+        if (comparePath.indexOf(path.sep) > -1) {
+            var compareFolder = sourcePath + comparePath.split(path.sep)[0];
+            log.info(`Folder: ${compareFolder}`);
+            if (ignoreFolder(compareFolder, sourcePath, options))
+                return true;
+        }
         ignoreFiles.forEach((ignoreFile) => {
             if (result) {
                 return;
