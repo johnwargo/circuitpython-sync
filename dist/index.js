@@ -62,14 +62,11 @@ function initOptions(options) {
 function ignoreFile(filePath, sourcePath, options) {
     var result = false;
     if (options.ignore) {
-        log.info('Checking for files to ignore');
         ignoreFiles.forEach((ignoreFile) => {
             if (result) {
                 return;
             }
-            log.info(`Comparing ${path.basename(filePath)} to ${ignoreFile}`);
             if (path.basename(filePath) == ignoreFile) {
-                log.info(`We have a match, so ignore this file`);
                 result = true;
             }
         });
@@ -81,9 +78,11 @@ function ignoreFolder(folderPath, sourcePath, options) {
     if (options.ignore) {
         var comparePath = folderPath.replace(sourcePath, '');
         ignoreFolders.forEach((ignoreFolder) => {
+            if (result) {
+                return;
+            }
             if (comparePath.startsWith(ignoreFolder)) {
                 result = true;
-                return;
             }
         });
     }
