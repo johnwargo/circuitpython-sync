@@ -118,7 +118,8 @@ function copyFile(sourceFile, sourcePath, destPath) {
     }
 }
 function deleteFile(deleteFile, sourcePath, destPath) {
-    var targetFile = deleteFile.replace(sourcePath, destPath);
+    var targetFile = deleteFile.replace(sourcePath, '');
+    targetFile = path.join(destPath, targetFile);
     log.debug(`Deleting ${targetFile}`);
     try {
         fs.unlinkSync(targetFile);
@@ -143,7 +144,8 @@ function makeDirectory(sourceDir, sourcePath, destPath) {
     }
 }
 function deleteDirectory(deleteDir, sourcePath, destPath) {
-    var targetDir = deleteDir.replace(sourcePath, destPath);
+    var targetDir = deleteDir.replace(sourcePath, '');
+    targetDir = path.join(destPath, targetDir);
     log.debug(`Deleting directory ${targetDir}`);
     try {
         fs.rmdirSync(targetDir);

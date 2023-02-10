@@ -109,8 +109,11 @@ function copyFile(sourceFile: string, sourcePath: string, destPath: string) {
   }
 }
 
-function deleteFile(deleteFile: string, sourcePath: string, destPath: string) {
-  var targetFile = deleteFile.replace(sourcePath, destPath);
+function deleteFile(deleteFile: string, sourcePath: string, destPath: string) {  
+  // strip the device path from the file path
+  var targetFile = deleteFile.replace(sourcePath, '');
+  targetFile = path.join(destPath, targetFile);
+
   log.debug(`Deleting ${targetFile}`);
   try {
     fs.unlinkSync(targetFile);
@@ -120,8 +123,6 @@ function deleteFile(deleteFile: string, sourcePath: string, destPath: string) {
 }
 
 function makeDirectory(sourceDir: string, sourcePath: string, destPath: string) {
-  // var targetDir = sourceDir.replace(sourcePath, path.resolve(destPath));
-
   // strip the device path from the file path
   var targetDir = sourceDir.replace(sourcePath, '');
   targetDir = path.join(destPath, targetDir);
@@ -139,7 +140,10 @@ function makeDirectory(sourceDir: string, sourcePath: string, destPath: string) 
 }
 
 function deleteDirectory(deleteDir: string, sourcePath: string, destPath: string) {
-  var targetDir = deleteDir.replace(sourcePath, destPath);
+  // strip the device path from the file path
+  var targetDir = deleteDir.replace(sourcePath, '');
+  targetDir = path.join(destPath, targetDir);
+
   log.debug(`Deleting directory ${targetDir}`);
   try {
     fs.rmdirSync(targetDir);
