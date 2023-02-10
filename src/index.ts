@@ -43,7 +43,6 @@ function initOptions(options: any) {
 function ignoreFile(filePath: string, sourcePath: string, options: any): boolean {
   var result = false;
   if (options.ignore) {
-
     // strip the device path from the file path
     var comparePath = filePath.replace(sourcePath, '');
     // do we have a delimiter?
@@ -152,19 +151,14 @@ function deleteDirectory(deleteDir: string, sourcePath: string, destPath: string
   }
 }
 
-// function displayConfig(devicePath: string, syncPath: string, delayVal: number) {
 function displayConfig(devicePath: string, syncPath: string, options: any) {
   log.info(`Device Path: ${devicePath}`);
   log.info(`Sync Path: ${syncPath}`);
   log.info(`Ignore Files: ${options.ignore}`);
   log.info(`Debug Mode: ${options.debug}`);
-  // if (delayVal > 0) {
-  //   log.info(`Delay: ${delayVal} seconds\n`);
-  // }
   log.info(' ');
 }
 
-// function validateArguments(devicePath: string, syncPath: string, delayVal: string): boolean {
 function validateArguments(devicePath: string, syncPath: string): boolean {
   var resultStr: String = "";
   var validationStatus: boolean = true;
@@ -178,12 +172,6 @@ function validateArguments(devicePath: string, syncPath: string): boolean {
     validationStatus = false;
   }
 
-  // //@ts-ignore
-  // if (isNaN(delayVal)) {
-  //   resultStr += `The delay value ${delayVal} is not a number.\n`;
-  //   validationStatus = false;
-  // }
-
   if (!validationStatus) {
     log.error("\nArgument Error(s):\n");
     log.error(error(resultStr));
@@ -191,7 +179,6 @@ function validateArguments(devicePath: string, syncPath: string): boolean {
   return validationStatus;
 }
 
-// async function watchFolder(devicePath: string, syncPath: string, delayVal: number) {
 async function watchFolder(devicePath: string, syncPath: string, options: any) {
   const watcher = chokidar.watch(devicePath, { persistent: true });
   watcher
@@ -253,20 +240,13 @@ program
   .option('-i, --ignore', 'Ignore non-project files', false)
   .argument('<devicePath>', 'File path to the Circuit Python device')
   .argument('<destFolder>', 'Destination (local) folder')
-  // .argument('[delayVal]', 'Number of seconds after a file change to wait before syncing')
-  // .action((devicePath: string, syncPath: string, delayVal: string = '0') => {
   .action((devicePath: string, destFolder: string) => {
     const options = program.opts();
     // Fix our dest folder if it's the current directory
-    if (destFolder === '.') destFolder = process.cwd();
-    // Initialize 'stuff'
-    initOptions(options);
-    // if (validateArguments(devicePath, syncPath, delayVal)) {
+    if (destFolder === '.') destFolder = process.cwd();    
+    initOptions(options); // Initialize 'stuff'
     if (validateArguments(devicePath, destFolder)) {
       log.debug("Configuration is valid");
-      // var delaySeconds = Math.abs(Number(delayVal));
-      // displayConfig(devicePath, syncPath, delaySeconds);
-      // watchFolder(devicePath, syncPath, delaySeconds);
       displayConfig(devicePath, destFolder, options);
       watchFolder(devicePath, destFolder, options);
     } else {
