@@ -50,7 +50,6 @@ function ignoreFile(filePath: string, sourcePath: string, options: any): boolean
     if (comparePath.indexOf(path.sep) > -1) {
       // then we have a directory in the path, check it out
       var compareFolder = sourcePath + comparePath.split(path.sep)[0];
-      log.info(`Folder: ${compareFolder}`)
       if (ignoreFolder(compareFolder, sourcePath, options)) return true;
     }
 
@@ -66,35 +65,6 @@ function ignoreFile(filePath: string, sourcePath: string, options: any): boolean
   }
   return result;
 }
-
-// function ignoreFile(filePath: string, sourcePath: string, options: any): boolean {
-//   if (options.ignore) {
-//     log.info('Checking for files to ignore');
-
-//     // strip the device path from the file path
-//     var comparePath = filePath.replace(sourcePath, '');
-//     // do we have a delimiter?
-//     if (comparePath.indexOf(path.sep) > -1) {
-//       // then we have a directory in the path, check it out
-//       var compareFolder = sourcePath + comparePath.split(path.sep)[0];
-//       log.info(`Folder: ${compareFolder}`)
-//       if (ignoreFolder(compareFolder, sourcePath, options)) return true;
-//     }
-
-//     // at this point we know:
-//     // 1. we're checking for files/folders to ignore
-//     // 2. we don't have a folder to ignore (since we made it this far)
-
-//     log.info(`Checking file: ${path.basename(filePath)}`);
-//     ignoreFiles.forEach((ignoreFile) => {
-//       if (path.basename(filePath) == ignoreFile) {
-//         log.info('we have a match!');
-//         return true;
-//       }
-//     });
-//   }
-//   return false;
-// }
 
 function ignoreFolder(folderPath: string, sourcePath: string, options: any): boolean {
   var result = false;
@@ -127,7 +97,11 @@ function directoryExists(filePath: string): boolean {
 }
 
 function copyFile(sourceFile: string, sourcePath: string, destPath: string) {
-  var targetFile = sourceFile.replace(sourcePath, destPath);
+  // var targetFile = sourceFile.replace(sourcePath, path.resolve(destPath));
+
+  // TODO: This doesn't fix this right, doesn't work with subdirectories
+  var targetFile = path.join(path.resolve(destPath), path.basename(sourceFile));
+
   log.debug(`Copying ${sourceFile} to ${targetFile}`);
   try {
     fs.copyFileSync(sourceFile, targetFile);
@@ -147,7 +121,7 @@ function deleteFile(deleteFile: string, sourcePath: string, destPath: string) {
 }
 
 function makeDirectory(sourceDir: string, sourcePath: string, destPath: string) {
-  var targetDir = sourceDir.replace(sourcePath, destPath);
+  var targetDir = sourceDir.replace(sourcePath, path.resolve(destPath));
   if (directoryExists(targetDir)) {
     log.debug(`Directory ${targetDir} already exists`);
     return;

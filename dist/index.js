@@ -65,7 +65,6 @@ function ignoreFile(filePath, sourcePath, options) {
         var comparePath = filePath.replace(sourcePath, '');
         if (comparePath.indexOf(path.sep) > -1) {
             var compareFolder = sourcePath + comparePath.split(path.sep)[0];
-            log.info(`Folder: ${compareFolder}`);
             if (ignoreFolder(compareFolder, sourcePath, options))
                 return true;
         }
@@ -108,7 +107,7 @@ function directoryExists(filePath) {
     return false;
 }
 function copyFile(sourceFile, sourcePath, destPath) {
-    var targetFile = sourceFile.replace(sourcePath, destPath);
+    var targetFile = path.join(path.resolve(destPath), path.basename(sourceFile));
     log.debug(`Copying ${sourceFile} to ${targetFile}`);
     try {
         fs.copyFileSync(sourceFile, targetFile);
@@ -128,7 +127,7 @@ function deleteFile(deleteFile, sourcePath, destPath) {
     }
 }
 function makeDirectory(sourceDir, sourcePath, destPath) {
-    var targetDir = sourceDir.replace(sourcePath, destPath);
+    var targetDir = sourceDir.replace(sourcePath, path.resolve(destPath));
     if (directoryExists(targetDir)) {
         log.debug(`Directory ${targetDir} already exists`);
         return;
