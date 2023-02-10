@@ -53,26 +53,33 @@ const ignoreFolders = [
     '.Trashes'
 ];
 var log = logger();
-var options;
-function initOptions() {
+function initOptions(options) {
     if (options.ignore)
         log.info('Ignore files mode enabled');
     log.level(options.debug ? log.DEBUG : log.INFO);
     log.info('Debug mode is enabled');
 }
-function ignoreFile(filePath) {
-    var result = false;
+function ignoreFile(filePath, sourcePath, options) {
     if (options.ignore) {
+        log.info('Checking for files to ignore');
+        var comparePath = filePath.replace(sourcePath, '');
+        if (comparePath.indexOf(path.sep) > -1) {
+            var compareFolder = sourcePath + comparePath.split(path.sep)[0];
+            log.info(`Folder: ${compareFolder}`);
+            if (ignoreFolder(compareFolder, sourcePath, options))
+                return true;
+        }
+        log.info(`Checking file: ${path.basename(filePath)}`);
         ignoreFiles.forEach((ignoreFile) => {
             if (path.basename(filePath) == ignoreFile) {
-                result = true;
-                return;
+                log.info('we have a match!');
+                return true;
             }
         });
     }
-    return result;
+    return false;
 }
-function ignoreFolder(folderPath, sourcePath) {
+function ignoreFolder(folderPath, sourcePath, options) {
     var result = false;
     if (options.ignore) {
         var comparePath = folderPath.replace(sourcePath, '');
@@ -141,9 +148,11 @@ function deleteDirectory(deleteDir, sourcePath, destPath) {
         log.error(error(`Error deleting directory: ${err}`));
     }
 }
-function displayConfig(devicePath, syncPath) {
+function displayConfig(devicePath, syncPath, options) {
     log.info(`Device Path: ${devicePath}`);
     log.info(`Sync Path: ${syncPath}`);
+    log.info(`Ignore Files: ${options.ignore}`);
+    log.info(`Debug Mode: ${options.debug}`);
     log.info(' ');
 }
 function validateArguments(devicePath, syncPath) {
@@ -163,11 +172,11 @@ function validateArguments(devicePath, syncPath) {
     }
     return validationStatus;
 }
-async function watchFolder(devicePath, syncPath) {
+async function watchFolder(devicePath, syncPath, options) {
     const watcher = chokidar.watch(devicePath, { persistent: true });
     watcher
         .on('add', (path) => {
-        if (!ignoreFile(path)) {
+        if (!ignoreFile(path, devicePath, options)) {
             log.info(`Adding ${path}`);
             copyFile(path, devicePath, syncPath);
         }
@@ -176,7 +185,7 @@ async function watchFolder(devicePath, syncPath) {
         }
     })
         .on('change', (path) => {
-        if (!ignoreFile(path)) {
+        if (!ignoreFile(path, devicePath, options)) {
             log.info(`File ${path} updated`);
             copyFile(path, devicePath, syncPath);
         }
@@ -185,7 +194,7 @@ async function watchFolder(devicePath, syncPath) {
         }
     })
         .on('unlink', (path) => {
-        if (!ignoreFile(path)) {
+        if (!ignoreFile(path, devicePath, options)) {
             log.info(`File ${path} has been removed`);
             deleteFile(path, devicePath, syncPath);
         }
@@ -194,7 +203,7 @@ async function watchFolder(devicePath, syncPath) {
         }
     })
         .on('addDir', (path) => {
-        if (!ignoreFolder(path, devicePath)) {
+        if (!ignoreFolder(path, devicePath, options)) {
             log.info(`Folder ${path} has been added`);
             makeDirectory(path, devicePath, syncPath);
         }
@@ -203,7 +212,7 @@ async function watchFolder(devicePath, syncPath) {
         }
     })
         .on('unlinkDir', (path) => {
-        if (!ignoreFolder(path, devicePath)) {
+        if (!ignoreFolder(path, devicePath, options)) {
             log.info(`Folder ${path} has been removed`);
             deleteDirectory(path, devicePath, syncPath);
         }
@@ -225,13 +234,13 @@ program
     .argument('<devicePath>', 'File path to the Circuit Python device')
     .argument('<destFolder>', 'Destination (local) folder')
     .action((devicePath, destFolder) => {
-    options = program.opts();
-    initOptions();
+    const options = program.opts();
+    initOptions(options);
     log.info(`Executing cpsync ${devicePath} ${destFolder}`);
     if (validateArguments(devicePath, destFolder)) {
         log.debug("Configuration is valid");
-        displayConfig(devicePath, destFolder);
-        watchFolder(devicePath, destFolder);
+        displayConfig(devicePath, destFolder, options);
+        watchFolder(devicePath, destFolder, options);
     }
     else {
         log.debug("Configuration is invalid");

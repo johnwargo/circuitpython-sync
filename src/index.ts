@@ -33,28 +33,53 @@ const ignoreFolders = [
 ] as const;
 
 var log = logger();
-var options: any;
 
-function initOptions() {
+function initOptions(options: any) {  
   if (options.ignore) log.info('Ignore files mode enabled');
   log.level(options.debug ? log.DEBUG : log.INFO);
   log.info('Debug mode is enabled');
 }
 
-function ignoreFile(filePath: string): boolean {
-  var result = false;
+// var result = false;
+  // if (options.ignore) {
+  //   ignoreFiles.forEach((ignoreFile) => {
+  //     if (path.basename(filePath) == ignoreFile) {
+  //       result = true;
+  //       return;
+  //     }
+  //   });
+  // }
+  // return result;
+function ignoreFile(filePath: string, sourcePath: string, options: any): boolean {
   if (options.ignore) {
+    log.info('Checking for files to ignore');
+
+    // strip the device path from the file path
+    var comparePath = filePath.replace(sourcePath, '');
+    // do we have a delimiter?
+    if (comparePath.indexOf(path.sep) > -1) {
+      // then we have a directory in the path, check it out
+      var compareFolder = sourcePath + comparePath.split(path.sep)[0];
+      log.info(`Folder: ${compareFolder}`)
+      if (ignoreFolder(compareFolder, sourcePath, options)) return true;
+    }
+
+    // at this point we know:
+    // 1. we're checking for files/folders to ignore
+    // 2. we don't have a folder to ignore (since we made it this far)
+
+    log.info(`Checking file: ${path.basename(filePath)}`);
     ignoreFiles.forEach((ignoreFile) => {
       if (path.basename(filePath) == ignoreFile) {
-        result = true;
-        return;
+        log.info('we have a match!');
+        return true;
       }
     });
   }
-  return result;
+  return false;
 }
 
-function ignoreFolder(folderPath: string, sourcePath: string): boolean {
+function ignoreFolder(folderPath: string, sourcePath: string, options: any): boolean {
   var result = false;
   if (options.ignore) {
     var comparePath = folderPath.replace(sourcePath, '');
@@ -127,9 +152,11 @@ function deleteDirectory(deleteDir: string, sourcePath: string, destPath: string
 }
 
 // function displayConfig(devicePath: string, syncPath: string, delayVal: number) {
-function displayConfig(devicePath: string, syncPath: string) {
+function displayConfig(devicePath: string, syncPath: string, options: any) {
   log.info(`Device Path: ${devicePath}`);
   log.info(`Sync Path: ${syncPath}`);
+  log.info(`Ignore Files: ${options.ignore}`);
+  log.info(`Debug Mode: ${options.debug}`);
   // if (delayVal > 0) {
   //   log.info(`Delay: ${delayVal} seconds\n`);
   // }
@@ -164,11 +191,11 @@ function validateArguments(devicePath: string, syncPath: string): boolean {
 }
 
 // async function watchFolder(devicePath: string, syncPath: string, delayVal: number) {
-async function watchFolder(devicePath: string, syncPath: string) {
+async function watchFolder(devicePath: string, syncPath: string, options: any) {
   const watcher = chokidar.watch(devicePath, { persistent: true });
   watcher
     .on('add', (path: string) => {
-      if (!ignoreFile(path)) {
+      if (!ignoreFile(path, devicePath, options)) {
         log.info(`Adding ${path}`);
         copyFile(path, devicePath, syncPath);
       } else {
@@ -176,7 +203,7 @@ async function watchFolder(devicePath: string, syncPath: string) {
       }
     })
     .on('change', (path: string) => {
-      if (!ignoreFile(path)) {
+      if (!ignoreFile(path, devicePath, options)) {
         log.info(`File ${path} updated`);
         copyFile(path, devicePath, syncPath);
       } else {
@@ -184,7 +211,7 @@ async function watchFolder(devicePath: string, syncPath: string) {
       }
     })
     .on('unlink', (path: string) => {
-      if (!ignoreFile(path)) {
+      if (!ignoreFile(path, devicePath, options)) {
         log.info(`File ${path} has been removed`);
         deleteFile(path, devicePath, syncPath);
       } else {
@@ -192,7 +219,7 @@ async function watchFolder(devicePath: string, syncPath: string) {
       }
     })
     .on('addDir', (path: string) => {
-      if (!ignoreFolder(path, devicePath)) {
+      if (!ignoreFolder(path, devicePath, options)) {
         log.info(`Folder ${path} has been added`);
         makeDirectory(path, devicePath, syncPath);
       } else {
@@ -200,7 +227,7 @@ async function watchFolder(devicePath: string, syncPath: string) {
       }
     })
     .on('unlinkDir', (path: string) => {
-      if (!ignoreFolder(path, devicePath)) {
+      if (!ignoreFolder(path, devicePath, options)) {
         log.info(`Folder ${path} has been removed`);
         deleteDirectory(path, devicePath, syncPath);
       } else {
@@ -224,9 +251,9 @@ program
   .argument('<destFolder>', 'Destination (local) folder')
   // .argument('[delayVal]', 'Number of seconds after a file change to wait before syncing')
   // .action((devicePath: string, syncPath: string, delayVal: string = '0') => {
-  .action((devicePath: string, destFolder: string) => {
-    options = program.opts();
-    initOptions();
+  .action((devicePath: string, destFolder: string) => {    
+    const options = program.opts();
+    initOptions(options);
     // log.info(`\nExecuting cpsync ${devicePath} ${syncPath} ${delayVal}`);
     log.info(`Executing cpsync ${devicePath} ${destFolder}`);
     // if (validateArguments(devicePath, syncPath, delayVal)) {
@@ -235,8 +262,8 @@ program
       // var delaySeconds = Math.abs(Number(delayVal));
       // displayConfig(devicePath, syncPath, delaySeconds);
       // watchFolder(devicePath, syncPath, delaySeconds);
-      displayConfig(devicePath, destFolder);
-      watchFolder(devicePath, destFolder);
+      displayConfig(devicePath, destFolder, options);
+      watchFolder(devicePath, destFolder, options);
     } else {
       log.debug("Configuration is invalid");
       process.exit(1);
