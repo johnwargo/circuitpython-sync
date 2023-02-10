@@ -34,50 +34,59 @@ const ignoreFolders = [
 
 var log = logger();
 
-function initOptions(options: any) {  
+function initOptions(options: any) {
   if (options.ignore) log.info('Ignore files mode enabled');
   log.level(options.debug ? log.DEBUG : log.INFO);
   log.info('Debug mode is enabled');
 }
 
-// var result = false;
-  // if (options.ignore) {
-  //   ignoreFiles.forEach((ignoreFile) => {
-  //     if (path.basename(filePath) == ignoreFile) {
-  //       result = true;
-  //       return;
-  //     }
-  //   });
-  // }
-  // return result;
 function ignoreFile(filePath: string, sourcePath: string, options: any): boolean {
+  var result = false;
   if (options.ignore) {
     log.info('Checking for files to ignore');
-
-    // strip the device path from the file path
-    var comparePath = filePath.replace(sourcePath, '');
-    // do we have a delimiter?
-    if (comparePath.indexOf(path.sep) > -1) {
-      // then we have a directory in the path, check it out
-      var compareFolder = sourcePath + comparePath.split(path.sep)[0];
-      log.info(`Folder: ${compareFolder}`)
-      if (ignoreFolder(compareFolder, sourcePath, options)) return true;
-    }
-
-    // at this point we know:
-    // 1. we're checking for files/folders to ignore
-    // 2. we don't have a folder to ignore (since we made it this far)
-
-    log.info(`Checking file: ${path.basename(filePath)}`);
     ignoreFiles.forEach((ignoreFile) => {
+      // https://masteringjs.io/tutorials/fundamentals/foreach-break
+      if (result) {
+        return;
+      }
+      log.info(`Comparing ${path.basename(filePath)} to ${ignoreFile}`);
       if (path.basename(filePath) == ignoreFile) {
-        log.info('we have a match!');
-        return true;
+        log.info(`We have a match, so ignore this file`);
+        result = true;
       }
     });
   }
-  return false;
+  return result;
 }
+
+// function ignoreFile(filePath: string, sourcePath: string, options: any): boolean {
+//   if (options.ignore) {
+//     log.info('Checking for files to ignore');
+
+//     // strip the device path from the file path
+//     var comparePath = filePath.replace(sourcePath, '');
+//     // do we have a delimiter?
+//     if (comparePath.indexOf(path.sep) > -1) {
+//       // then we have a directory in the path, check it out
+//       var compareFolder = sourcePath + comparePath.split(path.sep)[0];
+//       log.info(`Folder: ${compareFolder}`)
+//       if (ignoreFolder(compareFolder, sourcePath, options)) return true;
+//     }
+
+//     // at this point we know:
+//     // 1. we're checking for files/folders to ignore
+//     // 2. we don't have a folder to ignore (since we made it this far)
+
+//     log.info(`Checking file: ${path.basename(filePath)}`);
+//     ignoreFiles.forEach((ignoreFile) => {
+//       if (path.basename(filePath) == ignoreFile) {
+//         log.info('we have a match!');
+//         return true;
+//       }
+//     });
+//   }
+//   return false;
+// }
 
 function ignoreFolder(folderPath: string, sourcePath: string, options: any): boolean {
   var result = false;
@@ -251,7 +260,7 @@ program
   .argument('<destFolder>', 'Destination (local) folder')
   // .argument('[delayVal]', 'Number of seconds after a file change to wait before syncing')
   // .action((devicePath: string, syncPath: string, delayVal: string = '0') => {
-  .action((devicePath: string, destFolder: string) => {    
+  .action((devicePath: string, destFolder: string) => {
     const options = program.opts();
     initOptions(options);
     // log.info(`\nExecuting cpsync ${devicePath} ${syncPath} ${delayVal}`);

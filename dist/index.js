@@ -60,24 +60,21 @@ function initOptions(options) {
     log.info('Debug mode is enabled');
 }
 function ignoreFile(filePath, sourcePath, options) {
+    var result = false;
     if (options.ignore) {
         log.info('Checking for files to ignore');
-        var comparePath = filePath.replace(sourcePath, '');
-        if (comparePath.indexOf(path.sep) > -1) {
-            var compareFolder = sourcePath + comparePath.split(path.sep)[0];
-            log.info(`Folder: ${compareFolder}`);
-            if (ignoreFolder(compareFolder, sourcePath, options))
-                return true;
-        }
-        log.info(`Checking file: ${path.basename(filePath)}`);
         ignoreFiles.forEach((ignoreFile) => {
+            if (result) {
+                return;
+            }
+            log.info(`Comparing ${path.basename(filePath)} to ${ignoreFile}`);
             if (path.basename(filePath) == ignoreFile) {
-                log.info('we have a match!');
-                return true;
+                log.info(`We have a match, so ignore this file`);
+                result = true;
             }
         });
     }
-    return false;
+    return result;
 }
 function ignoreFolder(folderPath, sourcePath, options) {
     var result = false;
