@@ -2,6 +2,8 @@
 
 Node module that synchronizes the files on a connected CircuitPython device to a local project folder.
 
+npm package: https://www.npmjs.com/package/cpsync
+
 When you work with a CircuitPython device, you generally read and write executable Python files directly from/to the device; there's even a Python editor called [Mu](https://codewith.mu/) built just for this use case. 
 
 Many more experienced developers work with a local project folder then transfer the source code to a connected device, as you do when working with Arduino and other platforms. This module allows you to do both:
