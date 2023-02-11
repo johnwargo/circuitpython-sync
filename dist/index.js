@@ -58,12 +58,6 @@ function getTargetPath(sourcePath, destPath, eventPath) {
     result = path.join(destPath, result);
     return result;
 }
-function initOptions(options) {
-    if (options.ignore)
-        log.info('Ignore files mode enabled');
-    log.level(options.debug ? log.DEBUG : log.INFO);
-    log.info('Debug mode is enabled');
-}
 function ignoreFile(filePath, sourcePath, options) {
     var result = false;
     if (options.ignore) {
@@ -74,9 +68,8 @@ function ignoreFile(filePath, sourcePath, options) {
                 return true;
         }
         ignoreFiles.forEach((ignoreFile) => {
-            if (result) {
+            if (result)
                 return;
-            }
             if (path.basename(filePath) == ignoreFile) {
                 result = true;
             }
@@ -89,9 +82,8 @@ function ignoreFolder(folderPath, sourcePath, options) {
     if (options.ignore) {
         var comparePath = folderPath.replace(sourcePath, '');
         ignoreFolders.forEach((ignoreFolder) => {
-            if (result) {
+            if (result)
                 return;
-            }
             if (comparePath.startsWith(ignoreFolder)) {
                 result = true;
             }
@@ -155,22 +147,21 @@ function deleteDirectory(eventPath, sourcePath, destPath) {
         log.error(error(`Error deleting directory: ${err}`));
     }
 }
-function displayConfig(devicePath, syncPath, options) {
-    log.info(`Device Path: ${devicePath}`);
-    log.info(`Sync Path: ${syncPath}`);
-    log.info(`Ignore Files: ${options.ignore}`);
-    log.info(`Debug Mode: ${options.debug}`);
-    log.info(' ');
+function displayConfig(sourcePath, destPath, options) {
+    log.info(`Device Path: ${sourcePath}`);
+    log.info(`Sync Path: ${destPath}`);
+    log.info(`Ignore Files: ${options.ignore ? 'Yes' : 'No'}`);
+    log.info(`Debug Mode: ${options.debug ? 'Yes' : 'No'}\n`);
 }
-function validateArguments(devicePath, syncPath) {
+function validateArguments(sourcePath, destPath) {
     var resultStr = "";
     var validationStatus = true;
-    if (!directoryExists(devicePath)) {
-        resultStr += `The device path ${devicePath} does not exist or is not a directory.\n`;
+    if (!directoryExists(sourcePath)) {
+        resultStr += `The device path ${sourcePath} does not exist or is not a directory.\n`;
         validationStatus = false;
     }
-    if (!directoryExists(syncPath)) {
-        resultStr += `The sync path ${syncPath} does not exist or is not a directory.\n`;
+    if (!directoryExists(destPath)) {
+        resultStr += `The sync path ${destPath} does not exist or is not a directory.\n`;
         validationStatus = false;
     }
     if (!validationStatus) {
@@ -179,31 +170,31 @@ function validateArguments(devicePath, syncPath) {
     }
     return validationStatus;
 }
-async function watchFolder(devicePath, syncPath, options) {
-    const watcher = chokidar.watch(devicePath, { persistent: true });
+async function watchFolder(sourcePath, destPath, options) {
+    const watcher = chokidar.watch(sourcePath, { persistent: true });
     watcher
         .on('add', (eventPath) => {
-        if (!ignoreFile(eventPath, devicePath, options)) {
+        if (!ignoreFile(eventPath, sourcePath, options)) {
             log.info(`Adding ${eventPath}`);
-            copyFile(eventPath, devicePath, syncPath);
+            copyFile(eventPath, sourcePath, destPath);
         }
         else {
             log.info(warning(`Ignoring ${eventPath}`));
         }
     })
         .on('change', (eventPath) => {
-        if (!ignoreFile(eventPath, devicePath, options)) {
+        if (!ignoreFile(eventPath, sourcePath, options)) {
             log.info(`File ${eventPath} updated`);
-            copyFile(eventPath, devicePath, syncPath);
+            copyFile(eventPath, sourcePath, destPath);
         }
         else {
             log.info(warning(`Ignoring change to ${eventPath}`));
         }
     })
         .on('unlink', (eventPath) => {
-        if (!ignoreFile(eventPath, devicePath, options)) {
+        if (!ignoreFile(eventPath, sourcePath, options)) {
             log.info(`File ${eventPath} has been removed`);
-            deleteFile(eventPath, devicePath, syncPath);
+            deleteFile(eventPath, sourcePath, destPath);
         }
         else {
             log.info(warning(`Ignoring ${eventPath} deletion`));
@@ -212,25 +203,25 @@ async function watchFolder(devicePath, syncPath, options) {
         .on('addDir', (eventPath) => {
         if (path.basename(eventPath) == '.')
             return;
-        if (!ignoreFolder(eventPath, devicePath, options)) {
+        if (!ignoreFolder(eventPath, sourcePath, options)) {
             log.info(`Folder ${eventPath} has been added`);
-            makeDirectory(eventPath, devicePath, syncPath);
+            makeDirectory(eventPath, sourcePath, destPath);
         }
         else {
             log.info(warning(`Ignoring ${eventPath} directory`));
         }
     })
         .on('unlinkDir', (path) => {
-        if (!ignoreFolder(path, devicePath, options)) {
+        if (!ignoreFolder(path, sourcePath, options)) {
             log.info(`Folder ${path} has been removed`);
-            deleteDirectory(path, devicePath, syncPath);
+            deleteDirectory(path, sourcePath, destPath);
         }
         else {
             log.info(warning(`Ignoring ${path} deletion`));
         }
     })
         .on('error', (errStr) => log.error(error(`Watcher error: ${errStr}`)))
-        .on('ready', () => log.info(warning('Watching folder for changes')));
+        .on('ready', () => log.info(highlight('Watching folder for changes')));
 }
 log.info(figlet_1.default.textSync(packageDotJSON.name));
 log.info(highlight(`\nVersion: ${packageDotJSON.version}, by John M. Wargo\n`));
@@ -244,9 +235,9 @@ program
     .argument('<destFolder>', 'Destination (local) folder')
     .action((devicePath, destFolder) => {
     const options = program.opts();
+    log.level(options.debug ? log.DEBUG : log.INFO);
     if (destFolder === '.')
         destFolder = process.cwd();
-    initOptions(options);
     if (validateArguments(devicePath, destFolder)) {
         log.debug("Configuration is valid");
         displayConfig(devicePath, destFolder, options);
