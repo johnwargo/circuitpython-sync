@@ -2,6 +2,7 @@
 
 ![GitHub](https://img.shields.io/github/license/johnwargo/circuitpython-sync)
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/johnwargo/circuitpython-sync)
+![GitHub Issues](https://img.shields.io/github/issues/johnwargo/circuitpython-sync)
 ![npm](https://img.shields.io/npm/dw/cpsync)
 
 Node module that synchronizes the files on a connected CircuitPython device to a local project folder.
