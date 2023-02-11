@@ -42,16 +42,40 @@ To start the sync process, in a terminal window execute the following command:
 cpsync <device_path> <sync_path> [-d | --debug] [-i | --ignore]
 ```
 
-**Arguments:**
+Arguments:
 
 * `<device_path>` is the drive path for a connected CircuitPython device
 * `<sync_path>` is the local project folder where you want the module to copy the files from the connected CircuitPython device
 
-**Options:**
+Both command arguments are required (indicated by angle brackets `<` and `>`). Square brackets (`[` and `]`)indicate optional parameters.
 
+Options:
 
+* `-d` or `--debug` enables debug mode which writes additional information to the console as the module executes
+* `-i` or -`--ignore` instructs the module to ignore the internal files typically found on a CircuitPython device.
 
-Both command arguments are required (indicated by angle brackets `<` and `>`).
+A CircuitPython device hosts several internal use or housekeeping files that you don't need copied into your local project. When you enable ignore mode (by passing the `-i` option on the command line), the module ignores the following when synchronizing files from the CircuitPython device to your local project folder:
+
+``` typescript
+const ignoreFiles = [
+  'boot_out.txt',
+  'BOOTEX.LOG',
+  '.metadata_never_index',
+  'System Volume Information',
+  'test_results.txt',
+  '.Trashes'
+] as const;
+
+const ignoreFolders = [
+  '.fseventsd',
+  'System Volume Information',
+  '.Trashes'
+] as const;
+```
+
+If you find other device-side housekeeping files, let me know and I'll update the ignore arrays in the module.
+
+## Examples
 
 If you don't want to install the module globally, you can execute the module on the fly instead using:
 
@@ -59,7 +83,7 @@ If you don't want to install the module globally, you can execute the module on 
 npx cpsync <device_path> <sync_path>
 ```
 
-On Windows, the device will appear as a drive with a drive letter assignment. So, assuming it's drive H (your experience may vary but that's how it shows up on my Windows system) you would start the process using the following command:
+On Windows, the device appears as a drive with a drive letter assignment. So, assuming it's drive H (your experience may vary but that's how it shows up on my Windows system) start the module with the following command:
 
 ``` shell
 cpsync h: c:\dev\mycoolproject
