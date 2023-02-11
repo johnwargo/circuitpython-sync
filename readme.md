@@ -39,15 +39,17 @@ You'll want to install globally since CircuitPython projects don't generally use
 To start the sync process, in a terminal window execute the following command:
 
 ``` shell
-cpsync <device_path> <sync_path>
+cpsync <device_path> <sync_path> [-d | --debug] [-i | --ignore]
 ```
 
-where:
+Arguments:
 
 * `<device_path>` is the drive path for a connected CircuitPython device
 * `<sync_path>` is the local project folder where you want the module to copy the files from the connected CircuitPython device
 
-Both parameters are required.
+
+
+Both command arguments are required (indicated by angle brackets `<` and `>`).
 
 If you don't want to install the module globally, you can execute the module on the fly instead using:
 
