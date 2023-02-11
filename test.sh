@@ -1,3 +1,3 @@
 #!/bin/sh
 
-cpsync fakesrc fakedest
+cpsync /Volumes/CIRCUITPY/ . -d -i

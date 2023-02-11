@@ -2,4 +2,5 @@
 
 ## 2023-02-10
 
-Added support for the `-i` and `--ignore` parameters to ignore some of the internal files not related to the running CircuitPython application.
+* Added support for the `-i` and `--ignore` parameters to ignore some of the internal files not related to the running CircuitPython application.
+* Refactored the code dramatically to make function calls consistent.

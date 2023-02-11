@@ -1,1 +1,1 @@
-start cpsync fakesrc fakedest
+start cpsync h: . -d -t
