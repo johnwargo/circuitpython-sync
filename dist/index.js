@@ -53,6 +53,11 @@ const ignoreFolders = [
     '.Trashes'
 ];
 var log = logger();
+function getTargetPath(sourcePath, destPath, eventPath) {
+    var result = eventPath.replace(sourcePath, '');
+    result = path.join(destPath, result);
+    return result;
+}
 function initOptions(options) {
     if (options.ignore)
         log.info('Ignore files mode enabled');
@@ -106,49 +111,45 @@ function directoryExists(filePath) {
     }
     return false;
 }
-function copyFile(sourceFile, sourcePath, destPath) {
-    var targetFile = sourceFile.replace(sourcePath, '');
-    targetFile = path.join(destPath, targetFile);
-    log.debug(`Copying ${sourceFile} to ${targetFile}`);
+function copyFile(eventPath, sourcePath, destPath) {
+    var targetPath = getTargetPath(sourcePath, destPath, eventPath);
+    log.debug(`Copying ${eventPath} to ${targetPath}`);
     try {
-        fs.copyFileSync(sourceFile, targetFile);
+        fs.copyFileSync(eventPath, targetPath);
     }
     catch (err) {
         log.error(error(`Error copying file: ${err}`));
     }
 }
-function deleteFile(deleteFile, sourcePath, destPath) {
-    var targetFile = deleteFile.replace(sourcePath, '');
-    targetFile = path.join(destPath, targetFile);
-    log.debug(`Deleting ${targetFile}`);
+function deleteFile(eventPath, sourcePath, destPath) {
+    var targetPath = getTargetPath(sourcePath, destPath, eventPath);
+    log.debug(`Deleting ${targetPath}`);
     try {
-        fs.unlinkSync(targetFile);
+        fs.unlinkSync(targetPath);
     }
     catch (err) {
         log.error(error(`Error deleting file: ${err}`));
     }
 }
-function makeDirectory(sourceDir, sourcePath, destPath) {
-    var targetDir = sourceDir.replace(sourcePath, '');
-    targetDir = path.join(destPath, targetDir);
-    if (directoryExists(targetDir)) {
-        log.debug(`Directory ${targetDir} already exists`);
+function makeDirectory(eventPath, sourcePath, destPath) {
+    var targetPath = getTargetPath(sourcePath, destPath, eventPath);
+    if (directoryExists(targetPath)) {
+        log.debug(`Directory ${targetPath} already exists`);
         return;
     }
-    log.debug(`Creating directory ${targetDir}`);
+    log.debug(`Creating directory ${targetPath}`);
     try {
-        fs.mkdirSync(targetDir);
+        fs.mkdirSync(targetPath);
     }
     catch (err) {
         log.error(error(`Error creating directory: ${err}`));
     }
 }
-function deleteDirectory(deleteDir, sourcePath, destPath) {
-    var targetDir = deleteDir.replace(sourcePath, '');
-    targetDir = path.join(destPath, targetDir);
-    log.debug(`Deleting directory ${targetDir}`);
+function deleteDirectory(eventPath, sourcePath, destPath) {
+    var targetPath = getTargetPath(sourcePath, destPath, eventPath);
+    log.debug(`Deleting directory ${targetPath}`);
     try {
-        fs.rmdirSync(targetDir);
+        fs.rmdirSync(targetPath);
     }
     catch (err) {
         log.error(error(`Error deleting directory: ${err}`));

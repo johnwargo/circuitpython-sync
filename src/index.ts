@@ -34,6 +34,12 @@ const ignoreFolders = [
 
 var log = logger();
 
+function getTargetPath(sourcePath: string, destPath: string, eventPath: string): string {
+  var result = eventPath.replace(sourcePath, '');
+  result = path.join(destPath, result);
+  return result;
+}
+
 function initOptions(options: any) {
   if (options.ignore) log.info('Ignore files mode enabled');
   log.level(options.debug ? log.DEBUG : log.INFO);
@@ -95,57 +101,45 @@ function directoryExists(filePath: string): boolean {
   return false;
 }
 
-function copyFile(sourceFile: string, sourcePath: string, destPath: string) {
-  // strip the device path from the file path
-  var targetFile = sourceFile.replace(sourcePath, '');
-  targetFile = path.join(destPath, targetFile);
-
-  log.debug(`Copying ${sourceFile} to ${targetFile}`);
+function copyFile(eventPath: string, sourcePath: string, destPath: string) {
+  var targetPath = getTargetPath(sourcePath, destPath, eventPath);
+  log.debug(`Copying ${eventPath} to ${targetPath}`);
   try {
-    fs.copyFileSync(sourceFile, targetFile);
+    fs.copyFileSync(eventPath, targetPath);
   } catch (err) {
     log.error(error(`Error copying file: ${err}`));
   }
 }
 
-function deleteFile(deleteFile: string, sourcePath: string, destPath: string) {  
-  // strip the device path from the file path
-  var targetFile = deleteFile.replace(sourcePath, '');
-  targetFile = path.join(destPath, targetFile);
-
-  log.debug(`Deleting ${targetFile}`);
+function deleteFile(eventPath: string, sourcePath: string, destPath: string) {
+  var targetPath = getTargetPath(sourcePath, destPath, eventPath);
+  log.debug(`Deleting ${targetPath}`);
   try {
-    fs.unlinkSync(targetFile);
+    fs.unlinkSync(targetPath);
   } catch (err) {
     log.error(error(`Error deleting file: ${err}`));
   }
 }
 
-function makeDirectory(sourceDir: string, sourcePath: string, destPath: string) {
-  // strip the device path from the file path
-  var targetDir = sourceDir.replace(sourcePath, '');
-  targetDir = path.join(destPath, targetDir);
-
-  if (directoryExists(targetDir)) {
-    log.debug(`Directory ${targetDir} already exists`);
+function makeDirectory(eventPath: string, sourcePath: string, destPath: string) {
+  var targetPath = getTargetPath(sourcePath, destPath, eventPath);
+  if (directoryExists(targetPath)) {
+    log.debug(`Directory ${targetPath} already exists`);
     return;
   }
-  log.debug(`Creating directory ${targetDir}`);
+  log.debug(`Creating directory ${targetPath}`);
   try {
-    fs.mkdirSync(targetDir);
+    fs.mkdirSync(targetPath);
   } catch (err) {
     log.error(error(`Error creating directory: ${err}`));
   }
 }
 
-function deleteDirectory(deleteDir: string, sourcePath: string, destPath: string) {
-  // strip the device path from the file path
-  var targetDir = deleteDir.replace(sourcePath, '');
-  targetDir = path.join(destPath, targetDir);
-
-  log.debug(`Deleting directory ${targetDir}`);
+function deleteDirectory(eventPath: string, sourcePath: string, destPath: string) {
+  var targetPath = getTargetPath(sourcePath, destPath, eventPath);
+  log.debug(`Deleting directory ${targetPath}`);
   try {
-    fs.rmdirSync(targetDir);
+    fs.rmdirSync(targetPath);
   } catch (err) {
     log.error(error(`Error deleting directory: ${err}`));
   }
