@@ -52,7 +52,7 @@ Both command arguments are required (indicated by angle brackets `<` and `>`). S
 Options:
 
 * `-d` or `--debug` enables debug mode which writes additional information to the console as the module executes
-* `-i` or -`--ignore` instructs the module to ignore the internal files typically found on a CircuitPython device.
+* `-i` or `--ignore` instructs the module to ignore the internal files typically found on a CircuitPython device.
 
 A CircuitPython device hosts several internal use or housekeeping files that you don't need copied into your local project. When you enable ignore mode (by passing the `-i` option on the command line), the module ignores the following when synchronizing files from the CircuitPython device to your local project folder:
 
@@ -95,7 +95,7 @@ Assuming you'll launch the module from your project folder, use a `.` for the cu
 cpsync h: .
 ```
 
-On macOS, it mounts as a drive and you can access it via `/Volumes` folder. On my system, the device mounts as `CIRCUITPY`, so you can start the sync process using: 
+On macOS, it mounts as a drive and you can access it via `/Volumes` folder. On my system, the device mounts as `CIRCUITPY`, so start the sync process using: 
 
 ``` shell
 cpsync /Volumes/CIRCUITPY .
