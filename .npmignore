@@ -4,6 +4,7 @@ images/
 src/
 
 # Files
+changelog.md
 tsconfig.json
 test.sh
 test.cmd

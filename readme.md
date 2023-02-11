@@ -1,9 +1,9 @@
 # CircuitPython Sync
 
-![GitHub](https://img.shields.io/github/license/johnwargo/circuitpython-sync)
+![GitHub License](https://img.shields.io/github/license/johnwargo/circuitpython-sync)
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/johnwargo/circuitpython-sync)
 ![GitHub Issues](https://img.shields.io/github/issues/johnwargo/circuitpython-sync)
-![npm](https://img.shields.io/npm/dw/cpsync)
+![npm Downloads](https://img.shields.io/npm/dw/cpsync)
 
 Node module that synchronizes the files on a connected CircuitPython device to a local project folder.
 
@@ -113,7 +113,7 @@ This starts the module in a new/separate terminal window, leaving the Visual Stu
 For example, if I execute the following command:
 
 ``` shell
-start cpsync h: .
+start cpsync h: . -i
 ```
 
 A new window opens as shown in the following figure
