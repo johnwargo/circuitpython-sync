@@ -42,10 +42,12 @@ To start the sync process, in a terminal window execute the following command:
 cpsync <device_path> <sync_path> [-d | --debug] [-i | --ignore]
 ```
 
-Arguments:
+**Arguments:**
 
 * `<device_path>` is the drive path for a connected CircuitPython device
 * `<sync_path>` is the local project folder where you want the module to copy the files from the connected CircuitPython device
+
+**Options:**
 
 
 
