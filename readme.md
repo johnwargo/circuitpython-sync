@@ -5,7 +5,7 @@
 ![GitHub Issues](https://img.shields.io/github/issues/johnwargo/circuitpython-sync)
 ![npm Downloads](https://img.shields.io/npm/dw/cpsync)
 
-Node module that synchronizes the files on a connected CircuitPython device to a local project folder.
+Node module that synchronizes the files on a connected CircuitPython device to a local project folder. It provides a one-way sync from the CircuitPython device to the local project folder. Technically it does a copy rather than a sync, but if I included copy in the name, it would be `cpcopy` or `cp-copy` which looks like a merger of the Linux copy command `cp` plus the DOS copy command `copy` and that would be confusing.
 
 When you work with a CircuitPython device, you generally read and write executable Python files directly from/to the device; there's even a Python editor called [Mu](https://codewith.mu/) built just for this use case. 
 
