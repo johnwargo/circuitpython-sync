@@ -1,7 +1,7 @@
 {
   "name": "cpsync",
   "version": "0.0.4",
-  "description": "",
+  "description": "Synchronize files from a CircuitPython device to a local project folder",
   "main": "dist/index.js",
   "bin": {
     "cpsync": "dist/index.js"
