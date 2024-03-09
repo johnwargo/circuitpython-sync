@@ -20,6 +20,7 @@ const warning = chalk.hex('#FFA500');
 const ignoreFiles = [
   'boot_out.txt',
   'BOOTEX.LOG',
+  '.DS_Store',
   '.metadata_never_index',
   'System Volume Information',
   'test_results.txt',

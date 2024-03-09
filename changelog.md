@@ -1,5 +1,9 @@
 # Changelog
 
+## 2024-03-09
+
+Added the macOS `.DS_Store` file to the list of ignored files as requested in https://github.com/johnwargo/circuitpython-sync/issues/1. 
+
 ## 2024-02-04
 
 Added description to the project's `package.json` file.

@@ -61,6 +61,7 @@ A CircuitPython device hosts several internal use or housekeeping files that you
 const ignoreFiles = [
   'boot_out.txt',
   'BOOTEX.LOG',
+  '.DS_Store',
   '.metadata_never_index',
   'System Volume Information',
   'test_results.txt',
